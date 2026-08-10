@@ -13,8 +13,7 @@
             <label for="csv_file">Upload File</label>
             <button type="submit">Submit</button>
            
-
-            
         </form>
     </body>
 </html>
+<?php

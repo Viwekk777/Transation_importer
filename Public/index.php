@@ -13,7 +13,7 @@ $dotenv->load();
 
 $router = new Router();
 $router->registerRoutes('GET','/',[HomeController::class,'index']);
-
+$router->registerRoutes('POST','/',[HomeController::class,'transaction']);
 
 $router->Resolve(
     $_SERVER['REQUEST_METHOD'],
