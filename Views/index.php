@@ -12,8 +12,26 @@
             <input type="file" name="csv_file" id="csv_file">
             <label for="csv_file">Upload File</label>
             <button type="submit">Submit</button>
-           
-        </form>
-    </body>
+            
+
+<div id="error"></div>
+
+<?php if (isset($error)): ?>
+    <script>
+        const errorMessage = <?= json_encode($error) ?>;
+
+        document.getElementById('error').innerHTML =
+            `<div style="color:red;">${errorMessage}</div>`;
+
+        setTimeout(() => {
+            window.location.href = "/";
+        }, 3000);
+    </script>
+<?php endif; ?>
+
+</form>
+</body>
+
+
 </html>
 <?php
