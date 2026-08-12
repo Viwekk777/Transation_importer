@@ -40,4 +40,28 @@ class FileValidator
         throw new ValidationException('Wrong MIME type');
     }
 }
-}
+
+public function getValidatedFile()
+{
+ 
+  $file = $_FILES['csv_file'] ?? null;
+  $validator = new FileValidator();
+  try {
+  $validator->validate($file);
+
+
+ return $file;
+  }
+  catch (ValidationException $e) 
+  {
+    
+    $error=$e->getMessage();
+    require __DIR__ . "/../../Views/index.php";
+
+   
+
+  }
+  
+ 
+
+}}
