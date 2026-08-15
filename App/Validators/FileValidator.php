@@ -43,25 +43,20 @@ class FileValidator
 
 public function getValidatedFile()
 {
- 
-  $file = $_FILES['csv_file'] ?? null;
-  $validator = new FileValidator();
-  try {
-  $validator->validate($file);
+    $file = $_FILES['csv_file'] ?? null;
 
+    if ($file === null || $file['error'] === UPLOAD_ERR_NO_FILE) {
+        $error = 'No file was selected. Please choose a CSV file to upload.';
+        require __DIR__ . "/../../Views/index.php";
+        exit;
+    }
 
- return $file;
-  }
-  catch (ValidationException $e) 
-  {
-    
-    $error=$e->getMessage();
-    require __DIR__ . "/../../Views/index.php";
-
-   
-
-  }
-  
- 
-
+    try {
+        $this->validate($file);
+        return $file;
+    } catch (ValidationException $e) {
+        $error = $e->getMessage();
+        require __DIR__ . "/../../Views/index.php";
+        exit;
+    }
 }}

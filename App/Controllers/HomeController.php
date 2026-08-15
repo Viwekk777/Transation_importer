@@ -8,20 +8,24 @@ use App\Models\Db;
 
 class HomeController
 {
-      public function __construct(private Db $db)
+    public function __construct(private Db $db)
     {
     }
- 
-public function index()
-{
-  return require __DIR__ ."/../../Views/index.php";
-}
 
-public function transaction()
-{
-    return require __DIR__ ."/../../Views/Transaction.php";
+    public function index()
+    {
+        return require __DIR__ . "/../../Views/index.php";
+    }
 
-}
+    public function transaction()
+    {
+        $transactionModel = new Transaction($this->db);
+        $transactions = $transactionModel->getTransaction();
+        $totals = $transactionModel->calculateTotals($transactions);
+
+        return require __DIR__ . "/../../Views/Transaction.php";
+    }
+
     public function validateFile()
     {
         $validator = new FileValidator();
@@ -35,8 +39,4 @@ public function transaction()
         header("Location: /transaction");
         exit;
     }
-
-
 }
-
-

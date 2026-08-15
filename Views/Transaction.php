@@ -16,7 +16,6 @@ if (!function_exists('formatDollarAmount')) {
         return ($isNegative ? '-' : '') . '$' . number_format(abs($amount), 2);
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,8 +48,8 @@ if (!function_exists('formatDollarAmount')) {
     </head>
     <body>
         <div class="upload-container">
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="file" name="csv" accept=".csv" required />
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <input type="file" name="csv_file" id="csv_file" required />
                 <button type="submit">Upload CSV</button>
             </form>
         </div>
@@ -65,8 +64,8 @@ if (!function_exists('formatDollarAmount')) {
                 </tr>
             </thead>
             <tbody>
-                <?php if (! empty($transactions)): ?>
-                    <?php foreach($transactions as $transaction): ?>
+                <?php if (!empty($transactions)): ?>
+                    <?php foreach ($transactions as $transaction): ?>
                         <tr>
                             <td><?= formatDate($transaction['date']) ?></td>
                             <td><?= htmlspecialchars((string) ($transaction['checkNumber'] ?? '')) ?></td>
@@ -86,6 +85,10 @@ if (!function_exists('formatDollarAmount')) {
                             </td>
                         </tr>
                     <?php endforeach ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4">No transactions found. Upload a CSV file to get started.</td>
+                    </tr>
                 <?php endif ?>
             </tbody>
             <tfoot>
@@ -105,4 +108,3 @@ if (!function_exists('formatDollarAmount')) {
         </table>
     </body>
 </html>
-

@@ -1,35 +1,44 @@
 <?php
+
 declare(strict_types=1);
+
+use App\Container;
+use App\Controllers\HomeController;
+use App\Controllers\Router;
+use App\Exceptions\RouteNotFoundException;
+use App\Models\Db;
+use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use App\Container;
-use App\Controllers\Router;
-use App\Models\Db;
-use App\Controllers\HomeController;
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+// Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-// 1. Build the container and bind Db (it needs .env values, so it can't auto-wire itself)
+// 1. Build container and register services
 $container = new Container();
 
-$container->set(Db::class, function ($c) {
-    return new Db(
-        dsn: "mysql:host={$_ENV['DB_HOST']};dbname={$_ENV['DB_NAME']};charset=utf8mb4",
-        username: $_ENV['DB_USER'],
-        password: $_ENV['DB_PASS'],
-    );
-});
+$container->set(Db::class, fn () => new Db(
+    dsn: "mysql:host={$_ENV['DB_HOST']};dbname={$_ENV['DB_NAME']};charset=utf8mb4",
+    username: $_ENV['DB_USER'],
+    password: $_ENV['DB_PASS'],
+));
 
-// 2. Router gets the container — no more manually `new`-ing controllers
+// 2. Initialize Router with Container
 $router = new Router($container);
 
+// 3. Define Routes
 $router->registerRoutes('GET', '/', [HomeController::class, 'index']);
 $router->registerRoutes('POST', '/', [HomeController::class, 'validateFile']);
 $router->registerRoutes('GET', '/transaction', [HomeController::class, 'transaction']);
 
-$router->resolve(
-    $_SERVER['REQUEST_METHOD'],
-    $_SERVER['REQUEST_URI']
-);
+// 4. Resolve Request with query string safety & 404 exception handling
+try {
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    $router->resolve($method, $uri);
+} catch (RouteNotFoundException) {
+    http_response_code(404);
+    echo '404 Not Found';
+}
