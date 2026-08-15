@@ -1,38 +1,35 @@
 <?php
-declare(strict_types= 1);
-
+declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
-use App\Controllers\Router;
-use App\Validators\FileValidator;
-use App\Models\Db;
-use App\Models\Transaction;
-use App\Controllers\HomeController;
 
+use App\Container;
+use App\Controllers\Router;
+use App\Models\Db;
+use App\Controllers\HomeController;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-$db = new Db(
-    dsn: "mysql:host={$_ENV['DB_HOST']};dbname={$_ENV['DB_NAME']};charset=utf8mb4",
-    username: $_ENV['DB_USER'],
-    password: $_ENV['DB_PASS'],
-);
-$homeController = new HomeController($db);
+// 1. Build the container and bind Db (it needs .env values, so it can't auto-wire itself)
+$container = new Container();
 
+$container->set(Db::class, function ($c) {
+    return new Db(
+        dsn: "mysql:host={$_ENV['DB_HOST']};dbname={$_ENV['DB_NAME']};charset=utf8mb4",
+        username: $_ENV['DB_USER'],
+        password: $_ENV['DB_PASS'],
+    );
+});
 
+// 2. Router gets the container — no more manually `new`-ing controllers
+$router = new Router($container);
 
-$router = new Router();
-$router->registerRoutes('GET','/',[HomeController::class,'index']);
-$router->registerRoutes('POST','/',[HomeController::class,'validateFile']);
-$router->registerRoutes('GET','/transaction',[HomeController::class,'transaction']);
+$router->registerRoutes('GET', '/', [HomeController::class, 'index']);
+$router->registerRoutes('POST', '/', [HomeController::class, 'validateFile']);
+$router->registerRoutes('GET', '/transaction', [HomeController::class, 'transaction']);
 
-$router->Resolve(
+$router->resolve(
     $_SERVER['REQUEST_METHOD'],
     $_SERVER['REQUEST_URI']
 );
-
-
-
-
-

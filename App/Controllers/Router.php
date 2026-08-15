@@ -2,6 +2,7 @@
 declare(strict_types= 1);
 namespace App\Controllers;
 use App\Exceptions\RouteNotFoundException;
+use App\Container;
 
 class Router
 {
@@ -40,7 +41,7 @@ class Router
                 $method = $action[1] ?? null;
                 if(class_exists($class))
                     {
-                        $object = new $class();
+                        $object = new Container()->get($class) ;
                         if (method_exists($object, $method))
                             {
                                 return call_user_func_array([$object, $method], []);
