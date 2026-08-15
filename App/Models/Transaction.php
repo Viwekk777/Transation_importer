@@ -52,6 +52,11 @@ class Transaction
 
 
         }
+        public function getTransaction(): void
+        {
+            
+
+        }
 
 
 
