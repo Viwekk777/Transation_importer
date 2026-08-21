@@ -6,5 +6,8 @@ namespace App\Exceptions;
 
 class RouteNotFoundException extends \Exception
 {
-    protected $message = '404 Not Found';
+    public function __construct($message = 'Not Found')
+    {
+        parent::__construct($message, 404);
+    }
 }
